@@ -1,0 +1,9 @@
+{
+    "agents": [
+        "claude_code",
+        "antigravity",
+        "cursor",
+        "kiro"
+    ],
+    "guidelines": true
+}
