@@ -5,6 +5,8 @@ namespace Modules\Catalog\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Modules\Inventory\Models\StockMovement;
 
 class Product extends Model
 {
@@ -38,6 +40,24 @@ class Product extends Model
     public function category(): BelongsTo
     {
         return $this->belongsTo(Category::class, 'category_id');
+    }
+
+    /**
+     * All stock movement ledger entries for this product.
+     */
+    public function stockMovements(): HasMany
+    {
+        return $this->hasMany(StockMovement::class, 'product_id')
+            ->orderByDesc('created_at');
+    }
+
+    /**
+     * Current stock on hand — sum of all quantity_change entries.
+     * Returns 0 if no movements exist yet.
+     */
+    public function getCurrentStockAttribute(): int
+    {
+        return (int) $this->stockMovements()->sum('quantity_change');
     }
 
     // -------------------------------------------------------------------------

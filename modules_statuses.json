@@ -1,4 +1,5 @@
 {
     "Auth": true,
-    "Catalog": true
+    "Catalog": true,
+    "Inventory": true
 }

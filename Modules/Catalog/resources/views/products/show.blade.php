@@ -79,9 +79,18 @@
         <div class="card card-outline card-secondary">
             <div class="card-header"><h3 class="card-title">Stock</h3></div>
             <div class="card-body text-center">
-                <h2 class="text-primary" id="stockLevel">—</h2>
-                <p class="text-muted mb-0">Units in stock</p>
-                <small class="text-muted">(Inventory module — Phase 3)</small>
+                <h2 class="text-primary">{{ $product->current_stock }}</h2>
+                <p class="text-muted mb-2">Units in stock</p>
+                <a href="{{ route('admin.inventory.product-history', $product) }}"
+                   class="btn btn-sm btn-info btn-block">
+                    <i class="fas fa-history mr-1"></i> Stock History
+                </a>
+                @can('manage_inventory')
+                <a href="{{ route('admin.inventory.adjust', ['product_id' => $product->id]) }}"
+                   class="btn btn-sm btn-success btn-block mt-1">
+                    <i class="fas fa-edit mr-1"></i> Adjust Stock
+                </a>
+                @endcan
             </div>
         </div>
     </div>

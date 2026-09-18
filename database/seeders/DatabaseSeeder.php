@@ -5,6 +5,7 @@ namespace Database\Seeders;
 use Illuminate\Database\Seeder;
 use Modules\Auth\Database\Seeders\AuthDatabaseSeeder;
 use Modules\Catalog\Database\Seeders\CatalogDatabaseSeeder;
+use Modules\Inventory\Database\Seeders\InventoryDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -13,6 +14,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AuthDatabaseSeeder::class,
             CatalogDatabaseSeeder::class,
+            InventoryDatabaseSeeder::class,
         ]);
     }
 }
