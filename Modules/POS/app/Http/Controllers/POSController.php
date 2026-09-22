@@ -80,7 +80,6 @@ class PosController extends Controller
     {
         $items = collect($request->items);
 
-        // Calculate total from submitted prices (validated, but recalculate server-side)
         $total = $items->sum(fn ($item) => $item['unit_price'] * $item['quantity']);
 
         $sale = $this->sales->createWithItems(
@@ -95,10 +94,6 @@ class PosController extends Controller
             items: $request->items
         );
 
-        // Fire SaleCompleted:
-        //   → DeductStock (sync) — writes stock movements per item
-        //   → RecordSalesLedgerEntry (sync) — writes activity log
-        //   → GenerateReceiptPdf (queued) — background side effect
         SaleCompleted::dispatch($sale);
 
         return redirect()->route('admin.pos.sales.receipt', $sale)
@@ -112,7 +107,6 @@ class PosController extends Controller
     public function receipt(int $sale): View
     {
         $sale = $this->sales->findById($sale);
-
         abort_if(! $sale, 404);
 
         $receiptFooter = Setting::getValue('receipt_footer', 'Thank you for your purchase!');
@@ -130,10 +124,7 @@ class PosController extends Controller
     {
         $date = $request->query('date', today()->toDateString());
         $summary = $this->sales->dailySummary($date);
-
-        // Recent sales for the selected date
         $recentSales = $this->sales->paginate(['date' => $date], 20);
-
         $currencySymbol = Setting::getValue('currency_symbol', '$');
 
         return view('pos::pos.daily-summary', compact('summary', 'recentSales', 'date', 'currencySymbol'));

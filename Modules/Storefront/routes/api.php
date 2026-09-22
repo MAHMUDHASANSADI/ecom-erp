@@ -2,4 +2,4 @@
 
 use Illuminate\Support\Facades\Route;
 
-// POS has no API endpoints in v1
+// Storefront has no API endpoints in v1

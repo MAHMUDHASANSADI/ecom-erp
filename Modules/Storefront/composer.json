@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/storefront",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\Storefront\\": "app/",
+            "Modules\\Storefront\\Database\\Factories\\": "database/factories/",
+            "Modules\\Storefront\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\Storefront\\Tests\\": "tests/"
+        }
+    }
+}

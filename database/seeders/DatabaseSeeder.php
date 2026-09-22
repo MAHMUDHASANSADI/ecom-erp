@@ -6,6 +6,7 @@ use Illuminate\Database\Seeder;
 use Modules\Auth\Database\Seeders\AuthDatabaseSeeder;
 use Modules\Catalog\Database\Seeders\CatalogDatabaseSeeder;
 use Modules\Inventory\Database\Seeders\InventoryDatabaseSeeder;
+use Modules\Storefront\Database\Seeders\StorefrontDatabaseSeeder;
 
 class DatabaseSeeder extends Seeder
 {
@@ -15,6 +16,7 @@ class DatabaseSeeder extends Seeder
             AuthDatabaseSeeder::class,
             CatalogDatabaseSeeder::class,
             InventoryDatabaseSeeder::class,
+            StorefrontDatabaseSeeder::class,
         ]);
     }
 }

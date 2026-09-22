@@ -2,5 +2,6 @@
     "Auth": true,
     "Catalog": true,
     "Inventory": true,
-    "POS": true
+    "POS": true,
+    "Storefront": true
 }
