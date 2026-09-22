@@ -85,7 +85,7 @@
         </a>
 
         <div class="sidebar">
-            <div class="user-panel mt-3 pb-3 mb-3 d-flex">
+            <!-- <div class="user-panel mt-3 pb-3 mb-3 d-flex">
                 <div class="image">
                     <i class="fas fa-user-circle fa-2x text-white" style="opacity:.6;"></i>
                 </div>
@@ -93,7 +93,7 @@
                     <a href="#" class="d-block text-white">{{ auth()->user()->name }}</a>
                     <small class="text-muted">{{ auth()->user()->roles->first()?->name ?? '' }}</small>
                 </div>
-            </div>
+            </div> -->
 
             <nav class="mt-2">
                 <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
