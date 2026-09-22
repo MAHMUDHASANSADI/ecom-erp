@@ -3,5 +3,6 @@
     "Catalog": true,
     "Inventory": true,
     "POS": true,
-    "Storefront": true
+    "Storefront": true,
+    "Finance": true
 }
