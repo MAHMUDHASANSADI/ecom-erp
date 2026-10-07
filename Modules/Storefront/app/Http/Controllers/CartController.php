@@ -73,7 +73,7 @@ class CartController extends Controller
         return back()->with('success', "\"{$product->name}\" added to cart.");
     }
 
-    public function update(Request $request, int $productId): RedirectResponse
+    public function update(Request $request, int $productId): RedirectResponse|JsonResponse
     {
         $request->validate([
             'quantity' => ['required', 'integer', 'min:0'],
@@ -89,6 +89,19 @@ class CartController extends Controller
         }
 
         session([self::SESSION_KEY => $cart]);
+
+        if ($request->wantsJson()) {
+            $itemTotal = isset($cart[$key]) ? $cart[$key]['price'] * $cart[$key]['quantity'] : 0;
+            $cartTotal = collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']);
+            $cartCount = collect($cart)->sum('quantity');
+
+            return response()->json([
+                'success' => true,
+                'item_total' => number_format($itemTotal, 2),
+                'cart_total' => number_format($cartTotal, 2),
+                'cart_count' => $cartCount
+            ]);
+        }
 
         return back()->with('success', 'Cart updated.');
     }

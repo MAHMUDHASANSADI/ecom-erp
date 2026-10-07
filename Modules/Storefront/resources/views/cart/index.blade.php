@@ -55,14 +55,16 @@
                                     <input type="number" name="quantity" value="{{ $item['quantity'] }}"
                                            min="0" max="{{ $item['stock'] }}"
                                            class="form-control form-control-sm text-center mr-1"
+                                           data-cart-update="{{ route('storefront.cart.update', $item['product_id']) }}"
+                                           data-row-id="{{ $item['product_id'] }}"
                                            style="max-width:70px;"
-                                           onchange="this.form.submit()">
+                                           onchange="updateCartQuantity(this)">
                                 </form>
                             </td>
                             <td style="vertical-align:middle;" class="text-right">
                                 ${{ number_format($item['price'], 2) }}
                             </td>
-                            <td style="vertical-align:middle;" class="text-right font-weight-bold">
+                            <td style="vertical-align:middle;" class="text-right font-weight-bold" id="row-total-{{ $item['product_id'] }}">
                                 ${{ number_format($item['price'] * $item['quantity'], 2) }}
                             </td>
                             <td style="vertical-align:middle;">
@@ -81,7 +83,7 @@
                     <tfoot>
                         <tr class="table-light">
                             <td colspan="4" class="text-right font-weight-bold">Order Total:</td>
-                            <td class="text-right font-weight-bold text-success h5 mb-0">
+                            <td class="text-right font-weight-bold text-success h5 mb-0" id="cart-order-total">
                                 ${{ number_format(collect($cart)->sum(fn($i) => $i['price'] * $i['quantity']), 2) }}
                             </td>
                             <td></td>
@@ -110,3 +112,47 @@
     @endif
 </div>
 @endsection
+
+@push('scripts')
+<script>
+async function updateCartQuantity(input) {
+    const url = input.dataset.cartUpdate;
+    const rowId = input.dataset.rowId;
+    const quantity = input.value;
+    const csrfToken = document.querySelector('meta[name="csrf-token"]').content;
+
+    try {
+        const response = await fetch(url, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest',
+                'X-CSRF-TOKEN': csrfToken
+            },
+            body: JSON.stringify({ quantity })
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            if (data.success) {
+                if (quantity <= 0) {
+                    window.location.reload();
+                    return;
+                }
+                const rowTotalEl = document.getElementById('row-total-' + rowId);
+                if (rowTotalEl) rowTotalEl.innerText = '$' + data.item_total;
+                
+                const orderTotalEl = document.getElementById('cart-order-total');
+                if (orderTotalEl) orderTotalEl.innerText = '$' + data.cart_total;
+                
+                const cartBadgeEl = document.querySelector('.cart-badge');
+                if (cartBadgeEl) cartBadgeEl.innerText = data.cart_count;
+            }
+        }
+    } catch (e) {
+        console.error('Failed to update cart', e);
+    }
+}
+</script>
+@endpush

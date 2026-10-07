@@ -11,6 +11,7 @@ use Modules\Storefront\Http\Controllers\StorefrontController;
 | Public Storefront Routes — no auth required
 |--------------------------------------------------------------------------
 */
+
 Route::middleware('web')
     ->name('storefront.')
     ->group(function (): void {
@@ -50,6 +51,10 @@ Route::middleware('web')
 
         Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])
             ->name('checkout.confirmation');
+
+        // Pages
+        Route::view('/about', 'storefront::pages.about')->name('about');
+        Route::view('/contact', 'storefront::pages.contact')->name('contact');
     });
 
 /*
