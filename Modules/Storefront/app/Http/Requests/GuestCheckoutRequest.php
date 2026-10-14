@@ -21,6 +21,7 @@ class GuestCheckoutRequest extends FormRequest
             'customer_name' => ['required', 'string', 'max:150'],
             'email' => ['required', 'email', 'max:150'],
             'address' => ['required', 'string', 'max:1000'],
+            'payment_method' => ['required', 'in:cod,sslcommerz'],
         ];
     }
 }

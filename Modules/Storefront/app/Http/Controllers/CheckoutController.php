@@ -13,7 +13,8 @@ use Modules\Storefront\Repositories\Contracts\OrderRepositoryInterface;
 class CheckoutController extends Controller
 {
     public function __construct(
-        private readonly OrderRepositoryInterface $orders
+        private readonly OrderRepositoryInterface $orders,
+        private readonly PaymentController $payment
     ) {}
 
     public function index(): View|RedirectResponse
@@ -45,20 +46,35 @@ class CheckoutController extends Controller
             'unit_price' => $item['price'],
         ])->values()->toArray();
 
+        $paymentMethod = $request->payment_method; // 'cod' or 'sslcommerz'
+
+        // Determine initial status — SSLCommerz orders wait for gateway confirmation
+        $initialStatus = $paymentMethod === 'sslcommerz' ? 'payment_pending' : 'pending';
+
         $order = $this->orders->createWithItems(
             orderData: [
                 'customer_name' => $request->customer_name,
                 'email' => $request->email,
                 'address' => $request->address,
-                'status' => 'pending',
+                'status' => $initialStatus,
+                'payment_method' => $paymentMethod,
             ],
             items: $items
         );
 
-        // Clear cart after successful order
-        CartController::clearCart();
+        // -----------------------------------------------------------------------
+        // Payment method fork
+        // -----------------------------------------------------------------------
 
-        // Fire OrderPlaced → SendOrderConfirmationEmail (queued)
+        if ($paymentMethod === 'sslcommerz') {
+            // Clear cart immediately — order is created, gateway handles the rest
+            CartController::clearCart();
+            // Redirect to SSLCommerz gateway (OrderPlaced fires in PaymentController::success)
+            return $this->payment->initiate($order);
+        }
+
+        // COD path — original behaviour
+        CartController::clearCart();
         OrderPlaced::dispatch($order);
 
         return redirect()->route('storefront.checkout.confirmation', $order)
