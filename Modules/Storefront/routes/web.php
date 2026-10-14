@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use Modules\Storefront\Http\Controllers\CartController;
 use Modules\Storefront\Http\Controllers\CheckoutController;
 use Modules\Storefront\Http\Controllers\OrderController;
+use Modules\Storefront\Http\Controllers\PaymentController;
 use Modules\Storefront\Http\Controllers\StorefrontController;
 
 /*
@@ -51,6 +52,41 @@ Route::middleware('web')
 
         Route::get('/checkout/confirmation/{order}', [CheckoutController::class, 'confirmation'])
             ->name('checkout.confirmation');
+
+        // -----------------------------------------------------------------------
+        // SSLCommerz payment callbacks
+        // Static 'confirmation', 'failed', 'retry' before {order} wildcard
+        // IPN must be CSRF-exempt — excluded via VerifyCsrfToken or web middleware
+        // -----------------------------------------------------------------------
+
+        // Callbacks from SSLCommerz (POST — CSRF excluded below)
+        Route::post('/checkout/payment/success', [PaymentController::class, 'success'])
+            ->name('payment.success')
+            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+        Route::post('/checkout/payment/fail', [PaymentController::class, 'fail'])
+            ->name('payment.fail')
+            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+        Route::post('/checkout/payment/cancel', [PaymentController::class, 'cancel'])
+            ->name('payment.cancel')
+            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+        Route::post('/checkout/payment/ipn', [PaymentController::class, 'ipn'])
+            ->name('payment.ipn')
+            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+
+        // Failed page (GET) — static before {order}
+        Route::get('/checkout/payment/failed/{order}', [PaymentController::class, 'failed'])
+            ->name('payment.failed');
+
+        // Retry payment (GET)
+        Route::get('/checkout/payment/retry/{order}', [PaymentController::class, 'retry'])
+            ->name('payment.retry');
+
+        // Switch to COD (POST)
+        Route::post('/checkout/payment/switch-to-cod/{order}', [PaymentController::class, 'switchToCod'])
+            ->name('payment.switch-to-cod');
 
         // Pages
         Route::view('/about', 'storefront::pages.about')->name('about');

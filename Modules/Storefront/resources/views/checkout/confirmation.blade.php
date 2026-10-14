@@ -58,7 +58,28 @@
                 <dt class="col-4 text-muted">Delivery to</dt>
                 <dd class="col-8">{{ $order->address }}</dd>
                 <dt class="col-4 text-muted">Payment</dt>
-                <dd class="col-8">Cash on Delivery</dd>
+                <dd class="col-8">
+                    @if($order->payment_method === 'sslcommerz')
+                        <i class="fas fa-credit-card mr-1 text-success"></i> Paid Online
+                        @if($order->transaction_id)
+                            <br><small class="text-muted">Txn: {{ $order->transaction_id }}</small>
+                        @endif
+                    @else
+                        <i class="fas fa-truck mr-1"></i> Cash on Delivery
+                    @endif
+                </dd>
+                <dt class="col-4 text-muted">Status</dt>
+                <dd class="col-8">
+                    @php
+                        $colors = [
+                            'processing' => 'info', 'pending' => 'warning',
+                            'completed' => 'success', 'payment_pending' => 'secondary',
+                        ];
+                    @endphp
+                    <span class="badge badge-{{ $colors[$order->status] ?? 'secondary' }}">
+                        {{ ucfirst(str_replace('_', ' ', $order->status)) }}
+                    </span>
+                </dd>
                 <dt class="col-4 text-muted">Placed</dt>
                 <dd class="col-8">{{ $order->created_at->format('d M Y H:i') }}</dd>
             </dl>

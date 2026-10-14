@@ -92,11 +92,13 @@ class AuthDatabaseSeeder extends Seeder
     {
         $lookups = [
             // Order statuses
-            ['type' => 'order_status', 'code' => 'pending',    'label' => 'Pending',    'sort_order' => 1],
-            ['type' => 'order_status', 'code' => 'processing', 'label' => 'Processing', 'sort_order' => 2],
-            ['type' => 'order_status', 'code' => 'completed',  'label' => 'Completed',  'sort_order' => 3],
-            ['type' => 'order_status', 'code' => 'cancelled',  'label' => 'Cancelled',  'sort_order' => 4],
-            ['type' => 'order_status', 'code' => 'refunded',   'label' => 'Refunded',   'sort_order' => 5],
+            ['type' => 'order_status', 'code' => 'pending',         'label' => 'Pending',          'sort_order' => 1],
+            ['type' => 'order_status', 'code' => 'processing',       'label' => 'Processing',       'sort_order' => 2],
+            ['type' => 'order_status', 'code' => 'completed',        'label' => 'Completed',        'sort_order' => 3],
+            ['type' => 'order_status', 'code' => 'cancelled',        'label' => 'Cancelled',        'sort_order' => 4],
+            ['type' => 'order_status', 'code' => 'refunded',         'label' => 'Refunded',         'sort_order' => 5],
+            ['type' => 'order_status', 'code' => 'payment_pending',  'label' => 'Awaiting Payment', 'sort_order' => 6],
+            ['type' => 'order_status', 'code' => 'payment_failed',   'label' => 'Payment Failed',   'sort_order' => 7],
 
             // Payment methods
             ['type' => 'payment_method', 'code' => 'cash',            'label' => 'Cash',             'sort_order' => 1],
