@@ -25,6 +25,12 @@ class PaymentController extends Controller
 
     public function initiate(Order $order): RedirectResponse
     {
+        // Validate SSLCommerz credentials before making the API call
+        if (empty(config('sslcommerz.store.id')) || config('sslcommerz.store.id') === 'your_store_id_here') {
+            return redirect()->route('storefront.checkout.index')
+                ->with('error', 'Payment gateway not configured. Please register at developer.sslcommerz.com and add credentials to .env, or choose Cash on Delivery.');
+        }
+
         $order->load('items.product');
 
         $transactionId = 'ORD-'.$order->id.'-'.time();
@@ -32,26 +38,35 @@ class PaymentController extends Controller
         $response = Sslcommerz::setOrder(
             amount: $order->total,
             invoiceId: $transactionId,
-            invoiceDescription: 'Order #'.$order->id.' — '.$order->items->count().' item(s)'
+            productName: 'Order #'.$order->id,
+            productCategory: 'General'
         )
             ->setCustomer(
                 name: $order->customer_name,
                 email: $order->email,
-                phone: '01700000000',  // guest checkout — no phone field in v1
+                phone: '01700000000',
                 address: $order->address
             )
             ->setShippingInfo(
-                itemsCount: $order->items->count(),
+                quantity: $order->items->count(),
                 address: $order->address
             )
-            ->setExtraData(['value_a' => (string) $order->id])
-            ->makePayment();
+            ->makePayment(['value_a' => (string) $order->id]);
 
         if (! $response->success()) {
+            // Log the actual error for debugging
+            \Log::error('SSLCommerz initiation failed', [
+                'order_id' => $order->id,
+                'failed_reason' => $response->failedReason(),
+                'response' => $response->toArray(),
+            ]);
+
             $this->orders->updateStatus($order, 'payment_failed');
 
+            $errorMsg = $response->failedReason() ?? 'Payment gateway unavailable';
+
             return redirect()->route('storefront.checkout.index')
-                ->with('error', 'Payment gateway is unavailable. Please try again or choose Cash on Delivery.');
+                ->with('error', 'Payment error: '.$errorMsg.'. Please try Cash on Delivery or contact support.');
         }
 
         // Store the transaction ID we sent so we can verify it in callbacks
@@ -75,7 +90,7 @@ class PaymentController extends Controller
 
         // Validate transaction server-side — prevents fraudulent callbacks
         $isValid = Sslcommerz::validatePayment(
-            data: $request->all(),
+            payload: $request->all(),
             transactionId: $order->transaction_id,
             amount: $order->total
         );
@@ -167,7 +182,7 @@ class PaymentController extends Controller
 
         if ($request->status === 'VALID') {
             $isValid = Sslcommerz::validatePayment(
-                data: $request->all(),
+                payload: $request->all(),
                 transactionId: $order->transaction_id,
                 amount: $order->total
             );

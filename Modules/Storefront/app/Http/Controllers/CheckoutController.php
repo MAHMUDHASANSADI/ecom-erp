@@ -13,8 +13,7 @@ use Modules\Storefront\Repositories\Contracts\OrderRepositoryInterface;
 class CheckoutController extends Controller
 {
     public function __construct(
-        private readonly OrderRepositoryInterface $orders,
-        private readonly PaymentController $payment
+        private readonly OrderRepositoryInterface $orders
     ) {}
 
     public function index(): View|RedirectResponse
@@ -69,8 +68,9 @@ class CheckoutController extends Controller
         if ($paymentMethod === 'sslcommerz') {
             // Clear cart immediately — order is created, gateway handles the rest
             CartController::clearCart();
-            // Redirect to SSLCommerz gateway (OrderPlaced fires in PaymentController::success)
-            return $this->payment->initiate($order);
+
+            // Redirect to payment initiation route (OrderPlaced fires in PaymentController::success)
+            return redirect()->route('storefront.payment.initiate', $order);
         }
 
         // COD path — original behaviour

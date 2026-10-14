@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'active.user' => \Modules\Auth\Http\Middleware\EnsureUserIsActive::class,
         ]);
+
+        // Exclude SSLCommerz payment gateway callbacks from CSRF protection
+        $middleware->validateCsrfTokens(except: [
+            'checkout/payment/*',
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         $exceptions->shouldRenderJsonWhen(

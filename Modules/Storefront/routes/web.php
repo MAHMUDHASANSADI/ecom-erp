@@ -55,20 +55,24 @@ Route::middleware('web')
 
         // -----------------------------------------------------------------------
         // SSLCommerz payment callbacks
-        // Static 'confirmation', 'failed', 'retry' before {order} wildcard
+        // Static 'confirmation', 'failed', 'retry', 'initiate' before {order} wildcard
         // IPN must be CSRF-exempt — excluded via VerifyCsrfToken or web middleware
         // -----------------------------------------------------------------------
 
-        // Callbacks from SSLCommerz (POST — CSRF excluded below)
-        Route::post('/checkout/payment/success', [PaymentController::class, 'success'])
+        // Initiate payment (called after order creation)
+        Route::get('/checkout/payment/initiate/{order}', [PaymentController::class, 'initiate'])
+            ->name('payment.initiate');
+
+        // Callbacks from SSLCommerz (GET or POST — CSRF excluded below)
+        Route::match(['get', 'post'], '/checkout/payment/success', [PaymentController::class, 'success'])
             ->name('payment.success')
             ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-        Route::post('/checkout/payment/fail', [PaymentController::class, 'fail'])
+        Route::match(['get', 'post'], '/checkout/payment/fail', [PaymentController::class, 'fail'])
             ->name('payment.fail')
             ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
-        Route::post('/checkout/payment/cancel', [PaymentController::class, 'cancel'])
+        Route::match(['get', 'post'], '/checkout/payment/cancel', [PaymentController::class, 'cancel'])
             ->name('payment.cancel')
             ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
 
