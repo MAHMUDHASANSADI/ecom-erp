@@ -35,4 +35,11 @@ return [
         ],
     ],
 
+    'ai_chat' => [
+        'provider' => env('AI_CHAT_PROVIDER', 'gemini'),
+        'api_key' => env('AI_CHAT_API_KEY', ''),
+        'model' => env('AI_CHAT_MODEL', 'gemini-3.8-flash'),
+        'base_url' => env('AI_CHAT_BASE_URL', 'https://generativelanguage.googleapis.com/v1beta/openai/'),
+    ],
+
 ];

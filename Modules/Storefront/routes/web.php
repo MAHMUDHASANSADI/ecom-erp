@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Support\Facades\Route;
+use Modules\Storefront\Http\Controllers\AiChatController;
 use Modules\Storefront\Http\Controllers\CartController;
 use Modules\Storefront\Http\Controllers\CheckoutController;
 use Modules\Storefront\Http\Controllers\OrderController;
@@ -66,19 +68,19 @@ Route::middleware('web')
         // Callbacks from SSLCommerz (GET or POST — CSRF excluded below)
         Route::match(['get', 'post'], '/checkout/payment/success', [PaymentController::class, 'success'])
             ->name('payment.success')
-            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+            ->withoutMiddleware([VerifyCsrfToken::class]);
 
         Route::match(['get', 'post'], '/checkout/payment/fail', [PaymentController::class, 'fail'])
             ->name('payment.fail')
-            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+            ->withoutMiddleware([VerifyCsrfToken::class]);
 
         Route::match(['get', 'post'], '/checkout/payment/cancel', [PaymentController::class, 'cancel'])
             ->name('payment.cancel')
-            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+            ->withoutMiddleware([VerifyCsrfToken::class]);
 
         Route::post('/checkout/payment/ipn', [PaymentController::class, 'ipn'])
             ->name('payment.ipn')
-            ->withoutMiddleware([\Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class]);
+            ->withoutMiddleware([VerifyCsrfToken::class]);
 
         // Failed page (GET) — static before {order}
         Route::get('/checkout/payment/failed/{order}', [PaymentController::class, 'failed'])
@@ -95,6 +97,14 @@ Route::middleware('web')
         // Pages
         Route::view('/about', 'storefront::pages.about')->name('about');
         Route::view('/contact', 'storefront::pages.contact')->name('contact');
+
+        // AI Chatbot Assistant
+        Route::post('/shop/chat/message', [AiChatController::class, 'sendMessage'])
+            ->middleware('throttle:30,1')
+            ->name('chat.message');
+
+        Route::post('/shop/chat/clear', [AiChatController::class, 'clearHistory'])
+            ->name('chat.clear');
     });
 
 /*
