@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Modules\Auth\Http\Controllers\AdminAiController;
 use Modules\Auth\Http\Controllers\DashboardController;
 use Modules\Auth\Http\Controllers\LoginController;
 use Modules\Auth\Http\Controllers\LookupController;
@@ -60,4 +61,8 @@ Route::middleware(['auth', 'active.user'])
         Route::middleware('permission:manage_settings')->group(function (): void {
             Route::resource('navigation', NavigationItemController::class)->except(['show']);
         });
+
+        // AI ERP Copilot
+        Route::post('ai/chat', [AdminAiController::class, 'sendMessage'])->name('ai.chat');
+        Route::post('ai/clear', [AdminAiController::class, 'clearHistory'])->name('ai.clear');
     });

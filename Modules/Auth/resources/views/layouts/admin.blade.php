@@ -46,6 +46,13 @@
         </ul>
 
         <ul class="navbar-nav ml-auto">
+            {{-- AI Copilot Quick Button --}}
+            <li class="nav-item">
+                <a class="nav-link text-primary font-weight-bold" id="admin-ai-nav-btn" href="#" role="button" title="Open ERP AI Copilot">
+                    <i class="fas fa-brain mr-1"></i> <span class="d-none d-sm-inline">AI Copilot</span>
+                </a>
+            </li>
+
             {{-- Notifications placeholder --}}
             <li class="nav-item dropdown">
                 <a class="nav-link" data-toggle="dropdown" href="#">
@@ -194,6 +201,9 @@
         });
     });
 </script>
+
+{{-- Admin ERP AI Copilot Widget --}}
+@include('auth::partials.ai-admin-widget')
 
 @stack('scripts')
 </body>

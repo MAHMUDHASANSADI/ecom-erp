@@ -279,7 +279,13 @@ COMMON ADMIN SHORTCUTS:
         }
 
         // 4. Financial Expense Overview (Optional Permission Guard)
-        $canViewFinance = ! $user || $user->hasPermissionTo('view_finance_reports') || $user->hasRole('Owner');
+        $canViewFinance = false;
+        try {
+            $canViewFinance = ! $user || ! $user->exists || $user->can('view_finance_reports') || (method_exists($user, 'hasRole') && $user->hasRole('Owner'));
+        } catch (\Throwable) {
+            $canViewFinance = false;
+        }
+
         if ($canViewFinance) {
             try {
                 $monthExpenses = (float) Expense::inMonth(now()->year, now()->month)->sum('amount');
